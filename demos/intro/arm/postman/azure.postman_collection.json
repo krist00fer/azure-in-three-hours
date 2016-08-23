@@ -1,0 +1,340 @@
+{
+	"variables": [],
+	"info": {
+		"name": "ARM",
+		"_postman_id": "7be777e4-fe0e-1eff-5177-93a9bf0727a1",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authenticate",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": "var jsonData = JSON.parse(responseBody);\n\nvar tokenType = jsonData.token_type;\nvar accessToken = jsonData.access_token;\n\ntests[\"Token Type is Bearer\"] = (\"Bearer\" == tokenType);\ntests[\"Access Token is not empty\"] = (\"\" !== accessToken);\n\npostman.setEnvironmentVariable(\"token\", tokenType + ' ' + accessToken);"
+					}
+				}
+			],
+			"request": {
+				"url": "https://login.microsoftonline.com/{{tenant-id}}.onmicrosoft.com/oauth2/token?api-version=1.0",
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text",
+							"enabled": true
+						},
+						{
+							"key": "resource",
+							"value": "https://management.core.windows.net/",
+							"type": "text",
+							"enabled": true
+						},
+						{
+							"key": "client_id",
+							"value": "{{client-id}}",
+							"type": "text",
+							"enabled": true
+						},
+						{
+							"key": "client_secret",
+							"value": "{{client-password}}",
+							"type": "text",
+							"enabled": true
+						},
+						{
+							"key": "",
+							"value": "",
+							"type": "text",
+							"enabled": true
+						}
+					]
+				},
+				"description": "Authenticates against Azure AD using Service Principal"
+			},
+			"response": []
+		},
+		{
+			"name": "List all subscriptions",
+			"request": {
+				"url": "https://management.azure.com/subscriptions?api-version={{api-version}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": "List all subscriptions"
+			},
+			"response": []
+		},
+		{
+			"name": "List all resource groups",
+			"request": {
+				"url": "https://management.azure.com/subscriptions/{{subscription-id}}/resourcegroups?api-version={{api-version}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": "List all resource groups"
+			},
+			"response": []
+		},
+		{
+			"name": "List all of the available geo-locations",
+			"request": {
+				"url": "https://management.azure.com/subscriptions/{{subscription-id}}/locations?api-version={{api-version}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Create a resource group",
+			"request": {
+				"url": "https://management.azure.com/subscriptions/{{subscription-id}}/resourcegroups/{{resource-group-name}}?api-version={{api-version}}",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"location\": \"{{location}}\"\n}"
+				},
+				"description": "Create a resource group"
+			},
+			"response": []
+		},
+		{
+			"name": "Create a template deployment",
+			"request": {
+				"url": "https://management.azure.com/subscriptions/{{subscription-id}}/resourcegroups/{{resource-group-name}}/providers/microsoft.resources/deployments/{{deployment-name}}?api-version={{api-version}}",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"properties\": {\n    \"templateLink\": {\n      \"uri\": \"https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/101-vm-simple-linux/azuredeploy.json\",\n      \"contentVersion\": \"1.0.0.0\",\n    },\n    \"mode\": \"Incremental\",\n    \"parameters\": {\n        \"adminUsername\": {\n          \"value\": \"krist00fer\"\n        },\n        \"adminPassword\": {\n          \"value\": \"G@m1ngR0cks1337!\"\n        },\n        \"dnsLabelPrefix\": {\n          \"value\": \"krist00ferlinux\"\n        },\n        \"ubuntuOSVersion\": {\n          \"value\": \"15.10\"\n        }\n    }\n  }\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "List all resource providers",
+			"request": {
+				"url": "https://management.azure.com/subscriptions/{{subscription-id}}/providers?api-version={{api-version}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Create storage account",
+			"request": {
+				"url": "https://management.azure.com/subscriptions/{{subscription-id}}/resourceGroups/{{resource-group-name}}/providers/Microsoft.Storage/storageAccounts/krist123?api-version={{storage-api-version}}",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"location\": \"northeurope\",\n  \"properties\":{\n    \"accountType\": \"Standard_GRS\"\n  }\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "List storage accounts",
+			"request": {
+				"url": "https://management.azure.com/subscriptions/{{subscription-id}}/resourceGroups/{{resource-group-name}}/providers/Microsoft.Storage/storageAccounts?api-version={{storage-api-version}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get information about a template deployment",
+			"request": {
+				"url": "https://management.azure.com/subscriptions/{{subscription-id}}/resourcegroups/{{resource-group-name}}/providers/microsoft.resources/deployments/{{deployment-name}}?api-version={{api-version}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get information about a resource provider",
+			"request": {
+				"url": "https://management.azure.com/subscriptions/{{subscription-id}}/providers/Microsoft.Storage?api-version={{api-version}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get information about public IP",
+			"request": {
+				"url": "https://management.azure.com/subscriptions/{{subscription-id}}/resourcegroups/customdata/providers/Microsoft.Network/publicIPAddresses/myPublicIP?api-version=2016-03-30",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"description": ""
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
