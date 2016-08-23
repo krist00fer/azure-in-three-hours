@@ -11,7 +11,7 @@ IaaS, PaaS vs SaaS
   * PowerShell
   * Azure CLI
 * Azure Resource Manager
-  * Calling the APIs manually
+  * Calling the APIs - Using Chrome App Postman in order to call the REST APIs directly
   * Templates
 
 ### Web
